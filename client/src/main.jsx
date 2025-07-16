@@ -10,6 +10,13 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import FuelBillGenerator from "./pages/FuelBillGenerator.jsx";
 
+import {ClerkProvider} from "@clerk/clerk-react";
+
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+if (!PUBLISHABLE_KEY) {
+  throw new Error("VITE_CLERK_PUBLISHABLE_KEY is not defined");
+}
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -22,20 +29,23 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-
-    <ToastContainer
-      position="bottom-right" // Set position to bottom-right
-      autoClose={3000} // Automatically close after 3 seconds
-      limit={1}
-      hideProgressBar={false} // Show progress bar
-      newestOnTop={false} // Display newest on top
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-    />
+ 
+    <StrictMode>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+      <RouterProvider router={router} />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        limit={1}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+    </ClerkProvider>
   </StrictMode>
+  
 );

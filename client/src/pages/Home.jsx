@@ -1,35 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { User, CreditCard, Plus, Calendar, MapPin, DollarSign, LogOut, Menu, X } from 'lucide-react';
-
-
-// Simulated Clerk Auth Hook
-const useAuth = () => {
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate loading auth state
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-  }, []);
-
-  const signIn = () => {
-    // Simulate sign in
-    setUser({
-      id: '1',
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@example.com'
-    });
-  };
-
-  const signOut = () => {
-    setUser(null);
-  };
-
-  return { user, isLoading, signIn, signOut };
-};
+import { useState, useEffect } from 'react';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+import { User, CreditCard, Plus, Calendar, MapPin, DollarSign, Menu, X } from 'lucide-react';
 
 // Dummy fuel bills data
 const dummyBills = [
@@ -70,6 +41,17 @@ const dummyBills = [
   }
 ];
 
+// Router utility functions
+const getCurrentRoute = () => {
+  const hash = window.location.hash.slice(1);
+  return hash || 'landing';
+};
+
+const navigateToRoute = (route) => {
+  window.history.pushState({}, '', `#${route}`);
+  window.dispatchEvent(new HashChangeEvent('hashchange'));
+};
+
 const LandingPage = ({ onNavigate }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -93,12 +75,22 @@ const LandingPage = ({ onNavigate }) => {
               <a href="#features" className="text-gray-700 hover:text-blue-600 transition-colors">Features</a>
               <a href="#pricing" className="text-gray-700 hover:text-blue-600 transition-colors">Pricing</a>
               <a href="#contact" className="text-gray-700 hover:text-blue-600 transition-colors">Contact</a>
-              <button 
-                onClick={() => onNavigate('auth')}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105"
-              >
-                Sign In
-              </button>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
+                    Sign In
+                  </button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <button 
+                  onClick={() => onNavigate('dashboard')}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105"
+                >
+                  Dashboard
+                </button>
+                <UserButton />
+              </SignedIn>
             </div>
 
             {/* Mobile Menu Button */}
@@ -119,12 +111,22 @@ const LandingPage = ({ onNavigate }) => {
                 <a href="#features" className="text-gray-700 hover:text-blue-600 transition-colors">Features</a>
                 <a href="#pricing" className="text-gray-700 hover:text-blue-600 transition-colors">Pricing</a>
                 <a href="#contact" className="text-gray-700 hover:text-blue-600 transition-colors">Contact</a>
-                <button 
-                  onClick={() => onNavigate('auth')}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 w-full"
-                >
-                  Sign In
-                </button>
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 w-full">
+                      Sign In
+                    </button>
+                  </SignInButton>
+                </SignedOut>
+                <SignedIn>
+                  <button 
+                    onClick={() => onNavigate('dashboard')}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 w-full"
+                  >
+                    Dashboard
+                  </button>
+                  <UserButton afterSignOutUrl="/" />
+                </SignedIn>
               </div>
             </div>
           )}
@@ -151,12 +153,21 @@ const LandingPage = ({ onNavigate }) => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button 
-              onClick={() => onNavigate('auth')}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-            >
-              Go to Dashboard
-            </button>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                  Go to Dashboard
+                </button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <button 
+                onClick={() => onNavigate('dashboard')}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                Go to Dashboard
+              </button>
+            </SignedIn>
             <button className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-lg text-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition-all duration-300">
               Learn More
             </button>
@@ -200,55 +211,8 @@ const LandingPage = ({ onNavigate }) => {
   );
 };
 
-const AuthPage = ({ onNavigate }) => {
-  const { signIn } = useAuth();
-
-  const handleSignIn = () => {
-    signIn();
-    onNavigate('dashboard');
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CreditCard className="w-8 h-8 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900">Welcome Back</h2>
-          <p className="text-gray-600 mt-2">Sign in to access your dashboard</p>
-        </div>
-
-        <div className="space-y-4">
-          <button
-            onClick={handleSignIn}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105"
-          >
-            Sign In with Clerk
-          </button>
-          
-          <div className="text-center">
-            <button
-              onClick={() => onNavigate('landing')}
-              className="text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              Back to Home
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const Dashboard = ({ onNavigate }) => {
-  const { user, signOut } = useAuth();
   const [bills, setBills] = useState(dummyBills);
-
-  const handleSignOut = () => {
-    signOut();
-    onNavigate('landing');
-  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -276,21 +240,13 @@ const Dashboard = ({ onNavigate }) => {
             </div>
             
             <div className="flex items-center space-x-4">
-              <div className="hidden sm:flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-gray-600" />
-                </div>
-                <span className="text-gray-700">
-                  {user?.firstName} {user?.lastName}
-                </span>
-              </div>
               <button
-                onClick={handleSignOut}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
+                onClick={() => onNavigate('landing')}
+                className="text-gray-600 hover:text-gray-800 transition-colors"
               >
-                <LogOut className="w-5 h-5" />
-                <span className="hidden sm:inline">Sign Out</span>
+                Home
               </button>
+              <UserButton afterSignOutUrl="/" />
             </div>
           </div>
         </div>
@@ -301,7 +257,7 @@ const Dashboard = ({ onNavigate }) => {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back, {user?.firstName}!
+            Welcome back!
           </h1>
           <p className="text-gray-600">
             Here's an overview of your fuel bills and expenses.
@@ -413,9 +369,11 @@ const FuelBillGenerator = ({ onNavigate }) => {
     date: new Date().toISOString().split('T')[0]
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // In a real app, you'd send this to your API
+  const handleSubmit = () => {
+    if (!formData.stationName || !formData.location || !formData.amount || !formData.date) {
+      alert('Please fill in all fields');
+      return;
+    }
     console.log('New bill generated:', formData);
     onNavigate('dashboard');
   };
@@ -435,12 +393,15 @@ const FuelBillGenerator = ({ onNavigate }) => {
               </span>
             </div>
             
-            <button
-              onClick={() => onNavigate('dashboard')}
-              className="text-gray-600 hover:text-gray-800 transition-colors"
-            >
-              Back to Dashboard
-            </button>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => onNavigate('dashboard')}
+                className="text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                Back to Dashboard
+              </button>
+              <UserButton afterSignOutUrl="/" />
+            </div>
           </div>
         </div>
       </header>
@@ -475,6 +436,45 @@ const FuelBillGenerator = ({ onNavigate }) => {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Amount ($)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.amount}
+                onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Date
+              </label>
+              <input
+                type="date"
+                value={formData.date}
+                onChange={(e) => setFormData({...formData, date: e.target.value})}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="flex space-x-4">
+              <button
+                onClick={handleSubmit}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
+              >
+                Generate Bill
+              </button>
+              <button
+                onClick={() => onNavigate('dashboard')}
+                className="flex-1 border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition-all duration-300"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       </main>
@@ -483,44 +483,44 @@ const FuelBillGenerator = ({ onNavigate }) => {
 };
 
 const App = () => {
-  const [currentPage, setCurrentPage] = useState('landing');
-  const { user, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <CreditCard className="w-8 h-8 text-white" />
-          </div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  const [currentPage, setCurrentPage] = useState(() => getCurrentRoute());
 
   const handleNavigate = (page) => {
-    if (page === 'dashboard' && !user) {
-      setCurrentPage('auth');
-    } else if (page === 'fuel-bill-generator' && !user) {
-      setCurrentPage('auth');
-    } else {
-      setCurrentPage(page);
-    }
+    navigateToRoute(page);
   };
 
-  switch (currentPage) {
-    case 'landing':
-      return <LandingPage onNavigate={handleNavigate} />;
-    case 'auth':
-      return <AuthPage onNavigate={handleNavigate} />;
-    case 'dashboard':
-      return user ? <Dashboard onNavigate={handleNavigate} /> : <AuthPage onNavigate={handleNavigate} />;
-    case 'fuel-bill-generator':
-      return user ? <FuelBillGenerator onNavigate={handleNavigate} /> : <AuthPage onNavigate={handleNavigate} />;
-    default:
-      return <LandingPage onNavigate={handleNavigate} />;
-  }
+  useEffect(() => {
+    const handleRouteChange = () => {
+      const newRoute = getCurrentRoute();
+      setCurrentPage(newRoute);
+    };
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleRouteChange);
+    
+    // Listen for browser back/forward buttons
+    window.addEventListener('popstate', handleRouteChange);
+
+    // Cleanup event listeners
+    return () => {
+      window.removeEventListener('hashchange', handleRouteChange);
+      window.removeEventListener('popstate', handleRouteChange);
+    };
+  }, []);
+
+  return (
+    <div>
+      <SignedOut>
+        <LandingPage onNavigate={handleNavigate} />
+      </SignedOut>
+      
+      <SignedIn>
+        {currentPage === 'landing' && <LandingPage onNavigate={handleNavigate} />}
+        {currentPage === 'dashboard' && <Dashboard onNavigate={handleNavigate} />}
+        {currentPage === 'fuel-bill-generator' && <FuelBillGenerator onNavigate={handleNavigate} />}
+      </SignedIn>
+    </div>
+  );
 };
 
 export default App;
